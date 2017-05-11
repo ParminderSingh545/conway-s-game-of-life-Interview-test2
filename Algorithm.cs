@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,17 +14,49 @@ public class Algorithm
 		
 	}
 
-	public int RunSimulation(Node[,] nodes,int sx,int sy)
+	public Node[,] RunSimulation(Node[,] nodes)
 	{
-		int ans = -1;
+		Node[,] ans;
 
 		int marked = 1;
 		int unmarked = 0;
 
-		Node[] nd = GetNeighboursNodes (nodes,sx,sy);
+		for(int iy = 0; iy < Mathf.Sqrt(nodes.Length); iy++)
+		{
+			for(int ix = 0; ix < Mathf.Sqrt(nodes.Length); ix++)
+			{	
+				Node[] nebsNodes = GetNeighboursNodes(nodes,iy,ix);
+				int ocpcnt = 0;
+				for(int j = 0; j < nebsNodes.Length; j++)
+				{	
+					if(nebsNodes[j].occupied == 1)
+					{
+						ocpcnt = ocpcnt + 1;
+					}
+				}
+				if(ocpcnt < 2 && nodes[iy, ix].occupied == 1)
+				{
+					nodes [iy, ix].occupied = -1;
+				}
+				else
+				if(ocpcnt >= 2 && ocpcnt <= 3 && nodes [iy, ix].occupied == 1)
+				{
+					nodes [iy, ix].occupied = 1;
+				}
+				else
+				if(ocpcnt > 3 && nodes [iy, ix].occupied == 1)
+				{
+					nodes [iy, ix].occupied = -1;
+				}
+				else
+				if(nodes[iy, ix].occupied == -1 && ocpcnt == 3)
+				{
+					nodes [iy, ix].occupied = 1;	
+				}
+			}
+		}
 
-
-		return ans;
+		return nodes;
 	}
 
 	public int Mini(int a,int b)
@@ -39,11 +71,11 @@ public class Algorithm
 		return ans;
 	}
 
-	public Node[] GetNeighboursNodes(Node[,] nodes,int sx,int sy)
+	public Node[] GetNeighboursNodes(Node[,] nodes,int sy,int sx)
 	{
 		Node[] ans = null;
 
-		Node[] nbsnodes = GetNeighbours (nodes,sx,sy);
+		Node[] nbsnodes = GetNeighbours (nodes,sy,sx);
 		Node[] nbsnodesNew = new Node[nbsnodes.Length - 1];
 
 		for(int i = 0,l = 0; i < nbsnodes.Length; i++)
@@ -81,13 +113,9 @@ public class Algorithm
 		return ans;
 	}
 
-	public Node[] GetNeighbours(Node[,] nodes,int cx,int cy)
+	public Node[] GetNeighbours(Node[,] nodes,int cy,int cx)
 	{
 		Node[] ans = new Node[9];
-
-		int temp = cy;
-		cy = cx;
-		cx = temp;
 
 		for(int y = cy - 1, cntr = 0; y <= cy + 1; y++)
 		{
