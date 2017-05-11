@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -12,8 +12,7 @@ public class ConvoyGameManager : MonoBehaviour
 	public int n = 5;
 	public Color passedCells;
 	public Color failedCells;
-
-	public List<cell> selectedCell = new List<cell>();
+	public cell[,] cells;
 
 	// Use this for initialization
 	void Start () 
@@ -36,70 +35,45 @@ public class ConvoyGameManager : MonoBehaviour
 	public void CreateGrid(int n,GameObject btn,GameObject parent)
 	{
 		Algorithm.Node[,] nodes = new Algorithm.Node[n,n];
+		cell[,] clls = new cell[n,n];
 
-		for(int x = 0; x < n; x++)
+		for(int y = 0; y < n; y++)
 		{
-			for(int y = 0; y < n; y++)
+			for(int x = 0; x < n; x++)
 			{
-				nodes [x , y] = new Algorithm.Node ();
-				nodes [x , y].x = x;
-				nodes [x , y].y = y;
+				nodes [y , x] = new Algorithm.Node ();
+				nodes [y , x].y = y;
+				nodes [y , x].x = x;
 
 				GameObject go = Spawn (btn);
-				go.GetComponent<cell> ().assiggnedNode = nodes [x, y];
+				go.GetComponent<cell> ().assiggnedNode = nodes [y, x];
+				clls [y, x] = go.GetComponent<cell> ();
 				go.transform.SetParent (parent.transform,false);
-				go.GetComponent<RectTransform> ().localPosition = new Vector3 (go.GetComponent<RectTransform> ().localPosition.x + y*100,go.GetComponent<RectTransform> ().localPosition.y - x*100,go.GetComponent<RectTransform> ().localPosition.z);
+				go.GetComponent<RectTransform> ().localPosition = new Vector3 (go.GetComponent<RectTransform> ().localPosition.x + x*100,go.GetComponent<RectTransform> ().localPosition.y - y*100,go.GetComponent<RectTransform> ().localPosition.z);
 				go.GetComponent<cell> ().Init ();
 				go.GetComponent<cell> ().gm = this;
 			}
 		}
 
 		Nodes = nodes;
+		cells = clls;
 	}
 
 	public void OnRunSimulation()
 	{
-		for(int i = 0; i < selectedCell.Count; i++)
+		Nodes = alg.RunSimulation (Nodes);
+		for(int y = 0; y < n; y++)
 		{
-			selectedCell [i].GetComponent<Image> ().color = failedCells;
-		}
-		
-		int lim1 = 2;
-		int lim2 = 3;
-		int flag = -1;
-
-		int min = 999999999;
-		int limr = 0;
-		int its = 0;
-
-		for(int i = 0; i < selectedCell.Count; i++)
-		{
-			cell centerCell= selectedCell[i];
-			Algorithm.Node[] nd = alg.GetNeighboursNodes (Nodes,centerCell.assiggnedNode.x,centerCell.assiggnedNode.y);
-			limr = 0;
-			for(int j = 0; j < nd.Length; j++)
+			for(int x = 0; x < n; x++)
 			{
-				if (centerCell.assiggnedNode.occupied == 1 && nd [j].occupied == 1)
+				if (Nodes [y, x].occupied == 1) 
 				{
-					limr = limr + 1;
+					cells [y,x].GetComponent<Image> ().color = passedCells;
+				} 
+				else 
+				{
+					cells [y,x].GetComponent<Image> ().color = failedCells;
 				}
-				its = its + 1;
-			}
-			min = alg.Mini (limr,min);
-		}
-		if (min >= lim1 && min <= lim2) 
-		{
-			flag = 1;
-		} 
-		else 
-		{
-			flag = -1;
-		}
-		if (flag == 1) 
-		{
-			for(int i = 0; i < selectedCell.Count; i++)
-			{
-				selectedCell [i].GetComponent<Image> ().color = passedCells;
 			}
 		}
 	}
