@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,6 +8,8 @@ public class cell : MonoBehaviour
 	public ConvoyGameManager gm;
 	public Algorithm.Node assiggnedNode;
 
+	public int y;
+	public int x;
 	public Text cords_text;
 	public bool filled = false;
 	public Color filled_color;
@@ -16,12 +18,13 @@ public class cell : MonoBehaviour
 	// Use this for initialization
 	void Start () 
 	{
-		
+		y = assiggnedNode.y;
+		x = assiggnedNode.x;
 	}
 	
 	public void Init()
 	{
-		cords_text.text = assiggnedNode.x.ToString() + "," + assiggnedNode.y.ToString ();
+		cords_text.text = assiggnedNode.y.ToString() + "," + assiggnedNode.x.ToString ();
 	}
 
 	public void Fill()
